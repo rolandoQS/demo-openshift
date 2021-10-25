@@ -1,0 +1,72 @@
+package com.example.demo.controllers;
+
+import com.example.demo.Request.CreateUserRequest;
+import com.example.demo.Request.LoginRequest;
+import com.example.demo.common.AuthToken;
+import com.example.demo.config.TokenProvider;
+import com.example.demo.models.User;
+import com.example.demo.services.UsersService;
+import io.swagger.annotations.Api;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+
+@RequestMapping("auth")
+@Api(value = "Auth", tags = { "Auth" })
+public class AuthenticationController {
+
+    private final AuthenticationManager authenticationManager;
+
+    private final TokenProvider jwtTokenUtil;
+
+    private final UsersService usersService;
+
+    private final TokenProvider tokenProvider;
+
+    private final UserDetailsService userDetailsService;
+
+    public AuthenticationController(AuthenticationManager authenticationManager, TokenProvider jwtTokenUtil, UsersService usersService, TokenProvider tokenProvider, UserDetailsService userDetailsService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.usersService = usersService;
+        this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginUser) throws AuthenticationException {
+
+        final Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final String token = jwtTokenUtil.generateToken(authentication);
+        final String perfil = authentication.getAuthorities().stream().findFirst().get().getAuthority();
+        return ResponseEntity.ok(new AuthToken(token, perfil));
+    }
+
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseEntity<?> register(@RequestBody CreateUserRequest registerRequest){
+        User user = usersService.create(registerRequest);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+
+    }
+
+    @RequestMapping(value = "/validate", method = RequestMethod.GET)
+    public ResponseEntity<?> validate(@RequestParam String token, String email){
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        return new ResponseEntity<>(tokenProvider.validateToken(token,userDetails), HttpStatus.OK);
+    }
+
+
+
+}
