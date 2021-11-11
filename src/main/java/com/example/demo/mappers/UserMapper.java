@@ -6,6 +6,7 @@ import com.example.demo.entities.UserEntity;
 import com.example.demo.models.User;
 import com.example.demo.response.UserResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface UserMapper {
     List<User> listUserEntityToListUser(List<UserEntity> userEntities);
     UserResponse userToUserResponse(User user);
     List<UserResponse> userListToUserResponse(List<User> users);
+    @Mapping(target = "phones", ignore = true)
     User createUserRequestToUser(CreateUserRequest createUserRequest);
+
 
 }

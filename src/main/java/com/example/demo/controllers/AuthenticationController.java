@@ -4,6 +4,7 @@ import com.example.demo.Request.CreateUserRequest;
 import com.example.demo.Request.LoginRequest;
 import com.example.demo.common.AuthToken;
 import com.example.demo.config.TokenProvider;
+import com.example.demo.mappers.UserMapper;
 import com.example.demo.models.User;
 import com.example.demo.services.UsersService;
 import io.swagger.annotations.Api;
@@ -49,15 +50,20 @@ public class AuthenticationController {
                 new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = jwtTokenUtil.generateToken(authentication);
-        final String perfil = authentication.getAuthorities().stream().findFirst().get().getAuthority();
-        return ResponseEntity.ok(new AuthToken(token, perfil));
+        User user = usersService.loginUpdate(token,loginUser.getEmail());
+        return ResponseEntity.ok(UserMapper.INSTANCE.userToUserResponse(user));
     }
 
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> register(@RequestBody CreateUserRequest registerRequest){
         User user = usersService.create(registerRequest);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        final Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(registerRequest.getEmail(), registerRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final String token = jwtTokenUtil.generateToken(authentication);
+        user = usersService.loginUpdate(token,user.getEmail());
+        return new ResponseEntity<>(UserMapper.INSTANCE.userToUserResponse(user), HttpStatus.CREATED);
 
     }
 

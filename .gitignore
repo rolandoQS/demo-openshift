@@ -38,3 +38,5 @@ hs_err_pid*
 /.idea/runConfigurations.xml
 /target/generated-sources/annotations/com/example/demo/mappers/UserMapperImpl.java
 /.idea/vcs.xml
+/.idea/uiDesigner.xml
+/target/generated-sources/annotations/com/example/demo/mappers/PhoneMapperImpl.java

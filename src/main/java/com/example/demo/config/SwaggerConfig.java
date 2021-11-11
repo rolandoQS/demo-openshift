@@ -32,7 +32,7 @@ public class SwaggerConfig {
                 "Demo API created using Spring Boot",
                 "1.0",
                 "API Terms of Service URL",
-                new Contact("Rolando", "qwerty.com", "qwerty@gmail.com"),
+                new Contact("Rolando", "qwerty.com", "rolandoq.2011@gmail.com"),
                 "API License",
                 "API License URL",
                 Collections.emptyList()
