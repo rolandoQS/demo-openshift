@@ -22,11 +22,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Transactional
     @Modifying
     @Query("update UserEntity u set u.last_login = :last_login where u.email = :email ")
-    void updateLastLoginById(@Param(value = "last_login") Timestamp last_login, @Param(value = "email") String email);
+    void updateLastLoginByEmail(@Param(value = "last_login") Timestamp last_login, @Param(value = "email") String email);
 
     @Transactional
     @Modifying
     @Query("update UserEntity u set u.token = :token where u.email = :email ")
-    void updateTokenById(@Param(value = "token") String token, @Param(value = "email") String email);
+    void updateTokenByEmail(@Param(value = "token") String token, @Param(value = "email") String email);
 
 }
